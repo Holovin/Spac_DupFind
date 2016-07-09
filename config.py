@@ -17,6 +17,7 @@ class Config:
 
     #####################################
     # recount.py settings               #
+    STAT_LOG = True                     # enable log scale
     STAT_LOG_BASE = 3                   # log base for rating scale
 
     #####################################
