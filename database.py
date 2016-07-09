@@ -95,7 +95,7 @@ class Database:
             return False
 
         user = self.db[Config.TABLE_NAME].find_one({
-            'name': re.compile(login, re.IGNORECASE)
+            'name': re.compile('^' + login + '$', re.IGNORECASE)
         })
 
         if user is None:
@@ -118,13 +118,9 @@ class Database:
 
         for ua in unique_ua:
             # rating #
-            print(ua)
-
             rating_match = self.db[Config.TABLE_STAT_NAME].find_one({
                 self.USERAGENT_KEY: ua
             })
-
-            print(rating_match)
 
             if rating_match is None:
                 logging.fatal("Need recount rating... Stopping.")
@@ -272,11 +268,22 @@ class Database:
             # don't touch #
             break
 
+        def f_log(dm, ic):
+            return int(floor(math.log(dm - ic, Config.STAT_LOG_BASE)))
+
+        def f_dec(dm, ic):
+            return dm - ic
+
+        f = f_dec
+
+        if Config.STAT_LOG:
+            f = f_log
+
         for item in result:
             docs.append({
                 self.USERAGENT_KEY: str(item['_id']),
                 'count': item['count'],
-                'rating': int(floor(math.log(doc_max - item['count'], Config.STAT_LOG_BASE)))
+                'rating': f(doc_max, item['count'])
             })
 
         result = self.db[Config.TABLE_STAT_NAME].insert(docs)
