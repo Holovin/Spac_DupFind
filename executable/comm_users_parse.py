@@ -1,12 +1,14 @@
 #!/usr/bin/python
 
 import logging
-from database import Database
-from models.user import User
-from parsers.downloader import Downloader
-from parsers.spac_date import SpacDate
-from parsers.parse import Parse
+
 from config import Config
+from network import Network
+from models.user import User
+from parsers.json_api import JsonApi
+from parsers.parse import Parse
+from parsers.spac_date import SpacDate
+from storage.database import Database
 
 
 def main():
@@ -14,7 +16,7 @@ def main():
 
     sd = SpacDate()
     p = Parse(sd)
-    d = Downloader(p)
+    d = Network()
     db = Database()
 
     if not d.auth(Config.USER_NAME, Config.USER_PASSWORD):
@@ -30,7 +32,7 @@ def main():
             logging.fatal("Get user page error")
             exit()
 
-        users = p.parse_comm_users(d.get_data())
+        users = p.xpath_comm_users_page(d.get_data())
         logging.info("Parsed users: " + str(users))
 
         for user in users:
@@ -38,19 +40,23 @@ def main():
                 logging.error("Get user id error (user = " + user + "). Skipping...")
                 continue
 
-            u_id = p.extract_json_user_id(user, d.get_data_json())
+            u_id = JsonApi.json_extract_user_id(user, d.get_data_json())
+
+            if u_id is False:
+                logging.warning("User " + user + " not found")
+                continue
 
             if not d.get_user_hist(user):
                 logging.error("Get user hist error (user = " + user + "). Skipping...")
                 continue
 
-            u_hist = p.parse_hist(d.get_data())
+            u_hist = p.xpath_user_history(d.get_data())
 
             if not d.get_user_sess(user):
                 logging.error("Get user sess error (user = " + user + "). Skipping...")
                 continue
 
-            u_sess = p.parse_sess(d.get_data())
+            u_sess = p.xpath_user_sessions(d.get_data())
 
             db_user = User(u_id, user, u_hist, u_sess)
             db.upsert_user(db_user)

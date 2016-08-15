@@ -1,15 +1,15 @@
 #!/usr/bin/python
 
-import logging
 import datetime
+import logging
 
-from database import Database
-from models.user import User
+from network import Network
 from models.history import History
 from models.session import Session
-from parsers.downloader import Downloader
-from parsers.spac_date import SpacDate
+from models.user import User
 from parsers.parse import Parse
+from parsers.spac_date import SpacDate
+from storage.database import Database
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
 
     sd = SpacDate()
     p = Parse(sd)
-    d = Downloader(p)
+    d = Network(p)
     db = Database()
 
     ########################################################

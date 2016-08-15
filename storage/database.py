@@ -1,12 +1,13 @@
 import logging
+import math
 import re
 from math import floor
 
-import math
+from helpers.dict_converter import Dict2Obj
 from pymongo import MongoClient
-from object import Object
+
 from config import Config
-from dict_converter import Dict2Obj
+from helpers.object import Object
 
 
 class Database:
@@ -286,7 +287,8 @@ class Database:
                 'rating': f(doc_max, item['count'])
             })
 
-        result = self.db[Config.TABLE_STAT_NAME].insert(docs)
-        logging.info("Inserted: " + str(len(result)))
+        if len(docs) > 0:
+            result = self.db[Config.TABLE_STAT_NAME].insert(docs)
+            logging.info("Inserted: " + str(len(result)))
 
         return True

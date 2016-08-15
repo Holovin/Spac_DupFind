@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import logging
-from database import Database
+
+from storage.database import Database
 
 
 def main():

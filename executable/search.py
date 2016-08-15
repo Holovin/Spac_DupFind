@@ -3,23 +3,17 @@
 import logging
 import operator
 
-from database import Database
-from parsers.downloader import Downloader
-from parsers.spac_date import SpacDate
-from parsers.parse import Parse
 from config import Config
+from storage.database import Database
 
 
 def main():
     logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.INFO)
 
-    sd = SpacDate()
-    p = Parse(sd)
-    d = Downloader(p)
     db = Database()
 
     face = db.find_face(Config.SEARCH_LOGIN, Config.SEARCH_LEVEL)
-    if not d or Config.SEARCH_LOGIN == "":
+    if face is False or Config.SEARCH_LOGIN == "":
         logging.fatal("Empty result =/")
         exit()
 

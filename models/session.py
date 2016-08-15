@@ -1,4 +1,4 @@
-from dict_converter import Dict2Obj
+from helpers.dict_converter import Dict2Obj
 from models.history import History
 
 
